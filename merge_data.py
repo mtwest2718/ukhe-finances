@@ -3,17 +3,29 @@
 import pandas as pd
 import pdb
 
-tbls = [1,3,4,6,7,9,10,12,14]
-
 def make_negative(x):
     if isinstance(x,str):
         return '-' + x[1:-1] if x.startswith('(') else x
     else:
         return x
 
+def rename_category_col(long):
+    if tbl_id==12:
+        drop_cols = long.columns[4]
+    elif tbl_id==6:
+        drop_cols = list(long.columns[[2,4]])
+    else:
+        drop_cols = list(long.columns[3:-2])
+    # dropping category metadata columns
+    if drop_cols:
+        long = long.drop(columns=drop_cols)
+
+    return long.rename(columns={long.columns[-2]: 'category'})
+
 def read_table(tbl_id):
     # name of the CSV file 
     csv_file = f"table-{tbl_id}.csv"
+    print(csv_file)
 
     full_tbl = pd.read_csv(csv_file, skiprows=12)
     # make all column names lower case for easier filtering
@@ -41,11 +53,20 @@ def read_table(tbl_id):
     # convert values in parenthese into negative numbers
     numbers = df['value'].apply(make_negative)
     df.update(numbers)
-    df.convert_dtypes()
+    df = df.convert_dtypes()
 
-    return df
+    # drop excess category metadata
+    long = rename_category_col(df)
 
-long = read_table(tbls[0]) 
+    print(long.columns)
+
+    return long
+
+
+
+
+for T in [1,3,4,6,7,9,10,12,14]:
+    new_tbl = read_table(T)
 
 
 
