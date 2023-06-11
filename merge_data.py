@@ -77,7 +77,6 @@ def filter_categories(tbl_id, unfiltered):
             df['category']=='Funding body grants','Total funding body grant income')
     return df
 
-
 def parse_table(tbl_id):
     # name of the CSV file 
     csv_file = f"table-{tbl_id}.csv"
@@ -109,23 +108,32 @@ def parse_table(tbl_id):
     # convert values in parenthese into negative numbers
     numbers = df['value'].apply(make_negative)
     df.update(numbers)
-    df = df.convert_dtypes()
 
+    print(df.dtypes)
     # drop excess category metadata
     narrowed = rename_category_col(tbl_id, df)
     # select only the desired categories from each file
     long = filter_categories(tbl_id, narrowed)
 
-    print(long.columns)
-
     return long
+
+def key_financial_indictators(wide):
+    pass
+
 
 def main():
     tbls = [parse_table(T) for T in [1,3,4,6,7,9,12]]
     # merge tables vertically
     long_tbl = pd.concat(tbls, ignore_index=True)
+    LT = long_tbl.astype({'value':'float64'})
 
-    print(long_tbl)
+    # pivot table long to wide
+    wide = pd.pivot_table(
+        LT, values=["value"], columns=['category'], 
+        index=["ukprn","he provider","academic year"])
+    WV = wide['value']
+
+    # Table of Key Financial Indicators
 
 if __name__ == "__main__":
     main()
