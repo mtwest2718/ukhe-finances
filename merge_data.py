@@ -120,12 +120,14 @@ def parse_table(tbl_id):
 
     return long
 
+def main():
+    tbls = [parse_table(T) for T in [1,3,4,6,7,9,12]]
+    # merge tables vertically
+    long_tbl = pd.concat(tbls, ignore_index=True)
 
+    print(long_tbl)
 
-tbls = [parse_table(T) for T in [1,3,4,6,7,9,12]]
-# merge tables vertically
-long_tbl = pd.concat(tbls, ignore_index=True)
-print(long_tbl)
-
+if __name__ == "__main__":
+    main()
 
 
