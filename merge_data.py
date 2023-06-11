@@ -22,6 +22,19 @@ def rename_category_col(long):
 
     return long.rename(columns={long.columns[-2]: 'category'})
 
+def filter_categories(tbl_id, df):
+    cats = {
+        1: ['Total income', 'Total expenditure'],
+        3: [],
+        4: [],
+        6: [],
+        7: [],
+        9: [],
+        10: [],
+        12: [],
+        14: []
+    }
+
 def read_table(tbl_id):
     # name of the CSV file 
     csv_file = f"table-{tbl_id}.csv"
@@ -64,9 +77,9 @@ def read_table(tbl_id):
 
 
 
+tlbs = [read_table(T) for T in [1,3,4,6,7,9,10,12]]
+long_tbl = pdf.concat(tbls, ignore_index=True)
 
-for T in [1,3,4,6,7,9,10,12,14]:
-    new_tbl = read_table(T)
 
 
 
