@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import pandas as pd
+import numpy as np
 import pdb
 
 def make_negative(x):
@@ -29,7 +30,8 @@ def filter_categories(tbl_id, unfiltered):
     cats = {
         1: ['Total income',
             'Total expenditure',
-            'Staff costs'],
+            'Staff costs',
+            'Surplus/(deficit) before other gains/losses and share of surplus/(deficit) in joint ventures and associates'],
         3: ['Total net assets/(liabilities)',
             'Total current assets',
             'Bank overdrafts ',
@@ -37,10 +39,12 @@ def filter_categories(tbl_id, unfiltered):
             'Total creditors (amounts falling due within one year)',
             'Cash and cash equivalents ',
             'Deferred course fees',
-            'Other (including grant claw back)',
+            'Other (including grant claw back)',        # < 1 year
             'Tax and social security costs',
             'Total creditors (amounts falling due after more than one year)',
-            'Other (including grant claw back) '],
+            'Other (including grant claw back) ',       # > 1 year
+            'Income and expenditure reserve - unrestricted ',
+            'Revaluation reserve'],
         4: ['Net cash inflow from operating activities',
             'Depreciation',
             'Interest paid',
@@ -109,7 +113,6 @@ def parse_table(tbl_id):
     numbers = df['value'].apply(make_negative)
     df.update(numbers)
 
-    print(df.dtypes)
     # drop excess category metadata
     narrowed = rename_category_col(tbl_id, df)
     # select only the desired categories from each file
@@ -117,8 +120,52 @@ def parse_table(tbl_id):
 
     return long
 
-def key_financial_indictators(wide):
-    pass
+def key_financial_indicators(wide):
+    # start with institutional & year indetifiers
+    kfi = wide.loc[:,['ukprn', 'he provider', 'academic year']]
+
+    # annual surplus as % of income
+    surplus = wide['Surplus/(deficit) before other gains/losses and share of surplus/(deficit) in joint ventures and associates']
+    pension_adjust = wide['Changes to pension provisions'] + \
+        wide['Total changes to pension provisions/ pension adjustments']
+    kfi['surplus_vs_income'] = (surplus + pension_adjust) / wide['Total income']
+
+    # staff costs as % of income
+    kfi['staff_vs_income'] = (wide['Staff costs'] - pension_adjust) / wide['Total income']
+
+    # unrestricted reserves as % of income
+    unreserves = wide['Income and expenditure reserve - unrestricted '] + wide['Revaluation reserve']
+    kfi['unrestricted_vs_income'] = unreserves / wide['Total income']
+
+    # external borrowing as % of income
+    borrow = wide['Total creditors (amounts falling due within one year)'] - \
+        (wide['Bank overdrafts '] + wide['Deferred course fees'] + wide['Other (including grant claw back)']) + \
+        wide['Total creditors (amounts falling due after more than one year)'] - \
+        wide['Other (including grant claw back) ']
+    kfi['ext_borrow_vs_income'] = borrow / wide['Total income']
+
+    # Days ratio of Total net assets to total expenditure
+    kfi['net_assets_vs_expend'] = 365*wide['Total net assets/(liabilities)'] / (wide['Total expenditure'] - pension_adjust)
+
+    # Ratio of current assets to current liabilities
+    kfi['current_assets_vs_liability'] = wide['Total current assets'] / \
+        wide['Total creditors (amounts falling due within one year)']
+
+    # Net cash inflow from operating activities as a % of income
+    kfi['ops_cash_vs_income'] = wide['Net cash inflow from operating activities'] / wide['Total income']
+
+    # Net liquidity days
+    liquidity = wide['Investments '] + wide['Cash and cash equivalents '] - wide['Bank overdrafts ']
+    costs = wide['Total expenditure'] - wide['Depreciation'] - pension_adjust
+    kfi['net_liquidity_days'] = 365*liquidity/costs
+
+    # Debt service ratio
+    financing = wide['Interest paid'] + wide['Repayments of amounts borrowed'] + \
+        wide['Interest element of finance lease and service concession payments'] + \
+        wide['Capital element of finance lease and service concession payments']
+    kfi['debt_service_ratio'] = wide['Net cash inflow from operating activities'] / np.abs(financing)
+
+    return kfi
 
 
 def main():
@@ -131,9 +178,12 @@ def main():
     wide = pd.pivot_table(
         LT, values=["value"], columns=['category'], 
         index=["ukprn","he provider","academic year"])
-    WV = wide['value']
+    WV = wide['value'].reset_index()
 
     # Table of Key Financial Indicators
+    kfi = key_financial_indicators(WV)
+
+    print(kfi)
 
 if __name__ == "__main__":
     main()
