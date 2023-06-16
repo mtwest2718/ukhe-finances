@@ -35,7 +35,7 @@ def filter_categories(tbl_id, unfiltered):
         1: ['Total income',
             'Total expenditure',
             'Staff costs',
-            'Surplus/(deficit) before other gains/losses and share of surplus/(deficit) in joint ventures and associates'
+            'Surplus/(deficit) before other gains/losses and share of surplus/(deficit) in joint ventures and associates',
             'Depreciation and amortisation',
             'Interest and other finance costs'],
         3: ['Total net assets/(liabilities)',
@@ -66,7 +66,6 @@ def filter_categories(tbl_id, unfiltered):
             'Total residences and catering operations (including conferences)',
             'Funding body grants'],         # income from
         9: ['Total actual spend',
-            'Funding body grants',          # money from. used for capital expenditures
             'Internal funds',
             'Other external sources'],
         11: ['Performance related pay and other bonuses',
@@ -85,20 +84,20 @@ def filter_categories(tbl_id, unfiltered):
     }
 
     categories = cats[tbl_id]
-    df = unfiltered[ unfiltered['category'].isin(categories) ]
-    # double use of "Funding body grants"
-    if tbl_id==7:
-        df['category'].mask(
-            df['category']=='Funding body grants','Total funding body grant income')
-    return df
+    return unfiltered[ unfiltered['category'].isin(categories) ]
 
 def parse_zip(tbl_id):
     zip_file = f"table-{tbl_id}.zip"
+
+    tbls = []
+    # open zip file
     with zf(zip_file, 'r') as z:
         for fname in z.namelist():
             z.extractall('.',members=[fname])
             tbl = parse_table(tbl_id, csv_file=fname)
-            print(tbl)
+            tbls.append(tbl)            
+    # concat tables together
+    return pd.concat(tbls, ignore_index=True)
 
 def parse_table(tbl_id, csv_file=None):
     if not csv_file:
@@ -132,7 +131,6 @@ def parse_table(tbl_id, csv_file=None):
     numbers = df['value'].apply(make_negative)
     df.update(numbers)
 
-    pdb.set_trace()
     # drop excess category metadata
     narrowed = rename_category_col(tbl_id, df)
     # select only the desired categories from each file
@@ -198,7 +196,7 @@ def key_financial_indicators(wide):
 
     # Other sources as % of total income
     kfi['uk_vs_total_fees'] = wide['Total HE course fees'] / wide['Total UK fees']
-    kfi['fbg_vs_income'] = wide['Funding body grant income'] / income
+    kfi['fbg_vs_income'] = wide['Funding body grants'] / income
     kfi['research_vs_income'] = wide['Total research grants and contracts'] / income
     kfi['donate_vs_income'] = wide['Total donations and endowments'] / income
     kfi['reside_cater_vs_income'] = wide['Total residences and catering operations (including conferences)'] / income
@@ -207,7 +205,7 @@ def key_financial_indicators(wide):
     # Other expenditures
     kfi['finance_vs_expend'] = wide['Interest and other finance costs'] / expenditure
     kfi['depreciate_amort_vs_expend'] = wide['Depreciation and amortisation'] / expenditure
-    kfi['staff_vs_expend'] = (wide['Staff cost'] - pension_adjust) / expenditure
+    kfi['staff_vs_expend'] = (wide['Staff costs'] - pension_adjust) / expenditure
     kfi['capital_vs_expend'] = wide['Total actual spend'] / expenditure
     kfi['total_expenditure'] = expenditure
 
@@ -216,6 +214,8 @@ def key_financial_indicators(wide):
 
 def main():
     tbls = [parse_table(T) for T in [1,3,4,6,7,9,12]]
+    tbls.append(parse_zip(11))
+
     # merge tables vertically
     long_tbl = pd.concat(tbls, ignore_index=True)
     LT = long_tbl.astype({'value':'float64'})
