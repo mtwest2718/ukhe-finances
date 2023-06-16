@@ -191,6 +191,7 @@ def key_financial_indicators(wide):
     total_staff_num = wide['Average staff numbers (FTE) as disclosed in accounts'] + \
         wide['Total staff numbers (FTE) as disclosed in accounts']
     kfi['avg_salary'] = wide['Total salaries and wages'] / total_staff_num
+    kfi['avg_remuneration'] = (wide['Staff costs'] - pension_adjust) / total_staff_num
     kfi['academic_salary'] = wide['Salaries and wages academic staff'] / wide['Average academic staff numbers (FTE)']
     kfi['ps_staff_salary'] = wide['Salaries and wages non-academic staff'] / wide['Average non-academic staff numbers (FTE)']
 
@@ -208,6 +209,13 @@ def key_financial_indicators(wide):
     kfi['staff_vs_expend'] = (wide['Staff costs'] - pension_adjust) / expenditure
     kfi['capital_vs_expend'] = wide['Total actual spend'] / expenditure
     kfi['total_expenditure'] = expenditure
+
+    # Head of provider remuneration
+    basic = wide['Basic salary paid before salary sacrifice arrangements'] + wide['Basic salary']
+    remuneration = wide['Total remuneration (before salary sacrifice)']
+    kfi['vc_bonus_vs_salary'] = wide['Performance related pay and other bonuses'] / basic
+    kfi['galt_index_salary'] = basic / kfi['avg_salary']
+    kfi['galt_index_total'] = remuneration / kfi['avg_remuneration']
 
     return kfi
 
