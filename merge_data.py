@@ -2,6 +2,7 @@
 
 import pandas as pd
 import numpy as np
+from zipfile import ZipFile as zf
 import pdb
 
 def make_negative(x):
@@ -16,6 +17,9 @@ def rename_category_col(tbl_id, long):
     elif tbl_id==6:
         long = long[long['source of fees']=='Total']
         drop_cols = list(long.columns[[2,4]])
+    elif tbl_id==11:
+        long = long[long['head of provider marker']=='Total']
+        drop_cols = list(long.columns[[3,5]])
     else:
         if tbl_id==9:
             long = long[long['type of asset']=='Total capital expenditure']
@@ -31,7 +35,9 @@ def filter_categories(tbl_id, unfiltered):
         1: ['Total income',
             'Total expenditure',
             'Staff costs',
-            'Surplus/(deficit) before other gains/losses and share of surplus/(deficit) in joint ventures and associates'],
+            'Surplus/(deficit) before other gains/losses and share of surplus/(deficit) in joint ventures and associates'
+            'Depreciation and amortisation',
+            'Interest and other finance costs'],
         3: ['Total net assets/(liabilities)',
             'Total current assets',
             'Bank overdrafts ',
@@ -63,11 +69,16 @@ def filter_categories(tbl_id, unfiltered):
             'Funding body grants',          # money from. used for capital expenditures
             'Internal funds',
             'Other external sources'],
+        11: ['Performance related pay and other bonuses',
+            'Total remuneration (before salary sacrifice)',
+            'Basic salary paid before salary sacrifice arrangements',
+            'Basic salary'],
         12: ['Average staff numbers (FTE) as disclosed in accounts',
             'Total staff numbers (FTE) as disclosed in accounts',
             'Total changes to pension provisions/ pension adjustments',
             'Changes to pension provisions',
-            'Total salaries and wages','Salaries and wages academic staff',
+            'Total salaries and wages',
+            'Salaries and wages academic staff',
             'Salaries and wages non-academic staff',
             'Average academic staff numbers (FTE)',
             'Average non-academic staff numbers (FTE)']
@@ -81,9 +92,17 @@ def filter_categories(tbl_id, unfiltered):
             df['category']=='Funding body grants','Total funding body grant income')
     return df
 
-def parse_table(tbl_id):
-    # name of the CSV file 
-    csv_file = f"table-{tbl_id}.csv"
+def parse_zip(tbl_id):
+    zip_file = f"table-{tbl_id}.zip"
+    with zf(zip_file, 'r') as z:
+        for fname in z.namelist():
+            z.extractall('.',members=[fname])
+            tbl = parse_table(tbl_id, csv_file=fname)
+            print(tbl)
+
+def parse_table(tbl_id, csv_file=None):
+    if not csv_file:
+        csv_file = f"table-{tbl_id}.csv"
     print(csv_file)
 
     full_tbl = pd.read_csv(csv_file, skiprows=12)
@@ -113,6 +132,7 @@ def parse_table(tbl_id):
     numbers = df['value'].apply(make_negative)
     df.update(numbers)
 
+    pdb.set_trace()
     # drop excess category metadata
     narrowed = rename_category_col(tbl_id, df)
     # select only the desired categories from each file
@@ -124,46 +144,72 @@ def key_financial_indicators(wide):
     # start with institutional & year indetifiers
     kfi = wide.loc[:,['ukprn', 'he provider', 'academic year']]
 
+    ## KFIs from Table-14
     # annual surplus as % of income
-    surplus = wide['Surplus/(deficit) before other gains/losses and share of surplus/(deficit) in joint ventures and associates']
+    income = wide['Total income']
     pension_adjust = wide['Changes to pension provisions'] + \
         wide['Total changes to pension provisions/ pension adjustments']
-    kfi['surplus_vs_income'] = (surplus + pension_adjust) / wide['Total income']
+    expenditure = wide['Total expenditure'] - pension_adjust
+    
+    surplus = wide['Surplus/(deficit) before other gains/losses and share of surplus/(deficit) in joint ventures and associates']
+    kfi['surplus_vs_income'] = (surplus + pension_adjust) / income 
 
     # staff costs as % of income
-    kfi['staff_vs_income'] = (wide['Staff costs'] - pension_adjust) / wide['Total income']
+    kfi['staff_vs_income'] = (wide['Staff costs'] - pension_adjust) / income
 
     # unrestricted reserves as % of income
     unreserves = wide['Income and expenditure reserve - unrestricted '] + wide['Revaluation reserve']
-    kfi['unrestricted_vs_income'] = unreserves / wide['Total income']
+    kfi['unrestricted_vs_income'] = unreserves / income
 
     # external borrowing as % of income
     borrow = wide['Total creditors (amounts falling due within one year)'] - \
         (wide['Bank overdrafts '] + wide['Deferred course fees'] + wide['Other (including grant claw back)']) + \
         wide['Total creditors (amounts falling due after more than one year)'] - \
         wide['Other (including grant claw back) ']
-    kfi['ext_borrow_vs_income'] = borrow / wide['Total income']
+    kfi['ext_borrow_vs_income'] = borrow / income
 
     # Days ratio of Total net assets to total expenditure
-    kfi['net_assets_vs_expend'] = 365*wide['Total net assets/(liabilities)'] / (wide['Total expenditure'] - pension_adjust)
+    kfi['net_assets_vs_expend'] = 365*wide['Total net assets/(liabilities)'] / expenditure
 
     # Ratio of current assets to current liabilities
     kfi['current_assets_vs_liability'] = wide['Total current assets'] / \
         wide['Total creditors (amounts falling due within one year)']
 
     # Net cash inflow from operating activities as a % of income
-    kfi['ops_cash_vs_income'] = wide['Net cash inflow from operating activities'] / wide['Total income']
+    kfi['ops_cash_vs_income'] = wide['Net cash inflow from operating activities'] / income
 
     # Net liquidity days
     liquidity = wide['Investments '] + wide['Cash and cash equivalents '] - wide['Bank overdrafts ']
-    costs = wide['Total expenditure'] - wide['Depreciation'] - pension_adjust
-    kfi['net_liquidity_days'] = 365*liquidity/costs
+    kfi['net_liquidity_days'] = 365*liquidity/(expenditure - wide['Depreciation'])
 
     # Debt service ratio
     financing = wide['Interest paid'] + wide['Repayments of amounts borrowed'] + \
         wide['Interest element of finance lease and service concession payments'] + \
         wide['Capital element of finance lease and service concession payments']
     kfi['debt_service_ratio'] = wide['Net cash inflow from operating activities'] / np.abs(financing)
+
+    ## Other KFIs (of potential interest to staff)
+    # Pay per FTE in k£
+    total_staff_num = wide['Average staff numbers (FTE) as disclosed in accounts'] + \
+        wide['Total staff numbers (FTE) as disclosed in accounts']
+    kfi['avg_salary'] = wide['Total salaries and wages'] / total_staff_num
+    kfi['academic_salary'] = wide['Salaries and wages academic staff'] / wide['Average academic staff numbers (FTE)']
+    kfi['ps_staff_salary'] = wide['Salaries and wages non-academic staff'] / wide['Average non-academic staff numbers (FTE)']
+
+    # Other sources as % of total income
+    kfi['uk_vs_total_fees'] = wide['Total HE course fees'] / wide['Total UK fees']
+    kfi['fbg_vs_income'] = wide['Funding body grant income'] / income
+    kfi['research_vs_income'] = wide['Total research grants and contracts'] / income
+    kfi['donate_vs_income'] = wide['Total donations and endowments'] / income
+    kfi['reside_cater_vs_income'] = wide['Total residences and catering operations (including conferences)'] / income
+    kfi['total_income'] = income
+
+    # Other expenditures
+    kfi['finance_vs_expend'] = wide['Interest and other finance costs'] / expenditure
+    kfi['depreciate_amort_vs_expend'] = wide['Depreciation and amortisation'] / expenditure
+    kfi['staff_vs_expend'] = (wide['Staff cost'] - pension_adjust) / expenditure
+    kfi['capital_vs_expend'] = wide['Total actual spend'] / expenditure
+    kfi['total_expenditure'] = expenditure
 
     return kfi
 
@@ -177,13 +223,17 @@ def main():
     # pivot table long to wide
     wide = pd.pivot_table(
         LT, values=["value"], columns=['category'], 
-        index=["ukprn","he provider","academic year"])
+        index=["ukprn","he provider","academic year"], fill_value=0)
     WV = wide['value'].reset_index()
+
+    WV.to_csv('wide.csv')
 
     # Table of Key Financial Indicators
     kfi = key_financial_indicators(WV)
+    kfi = kfi.round(3)
+    kfi.to_csv('kfi.csv')
 
-    print(kfi)
+    return kfi
 
 if __name__ == "__main__":
     main()
