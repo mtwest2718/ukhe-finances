@@ -239,6 +239,13 @@ def main():
     # Table of Key Financial Indicators
     kfi = key_financial_indicators(WV)
     kfi = kfi.round(3)
+
+    # Get provider group IDs
+    pg = pd.read_csv('provider_groups.csv')
+    pg = pg.rename(str.lower, axis='columns')
+    pg = pg.rename(columns={'provider ukprn':'ukprn'})
+    # add these to KFIs
+    kfi = kfi.join(pg.set_index('ukprn'), on='ukprn', how='inner')
     kfi.to_csv('kfi.csv')
 
     return kfi
