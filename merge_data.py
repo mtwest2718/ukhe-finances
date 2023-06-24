@@ -18,7 +18,11 @@ def rename_category_col(tbl_id, long):
         long = long[long['source of fees']=='Total']
         drop_cols = list(long.columns[[2,4]])
     elif tbl_id==11:
-        long = long[long['head of provider marker']=='Total']
+        long = long[
+            (long['head of provider marker']=='Total') | ( 
+                (long['remuneration'].str.startswith('Head of')) & (long['value'] != '0')
+            )
+        ]
         drop_cols = list(long.columns[[3,5]])
     else:
         if tbl_id==9:
@@ -34,7 +38,6 @@ def filter_categories(tbl_id, unfiltered):
     cats = {
         1: ['Total income',
             'Total expenditure',
-            'Staff costs',
             'Surplus/(deficit) before other gains/losses and share of surplus/(deficit) in joint ventures and associates',
             'Depreciation and amortisation',
             'Interest and other finance costs'],
@@ -71,8 +74,11 @@ def filter_categories(tbl_id, unfiltered):
         11: ['Performance related pay and other bonuses',
             'Total remuneration (before salary sacrifice)',
             'Basic salary paid before salary sacrifice arrangements',
-            'Basic salary'],
-        12: ['Average staff numbers (FTE) as disclosed in accounts',
+            'Basic salary',
+            "Head of the provider's basic salary divided by the median pay (salary)",
+            "Head of the provider's total remuneration divided by the median total remuneration."],
+        12: ['Total staff costs',
+            'Average staff numbers (FTE) as disclosed in accounts',
             'Total staff numbers (FTE) as disclosed in accounts',
             'Total changes to pension provisions/ pension adjustments',
             'Changes to pension provisions',
@@ -130,7 +136,7 @@ def parse_table(tbl_id, csv_file=None):
     # convert values in parenthese into negative numbers
     numbers = df['value'].apply(make_negative)
     df.update(numbers)
-
+    
     # drop excess category metadata
     narrowed = rename_category_col(tbl_id, df)
     # select only the desired categories from each file
@@ -153,7 +159,7 @@ def key_financial_indicators(wide):
     kfi['surplus_vs_income'] = (surplus + pension_adjust) / income 
 
     # staff costs as % of income
-    kfi['staff_vs_income'] = (wide['Staff costs'] - pension_adjust) / income
+    kfi['staff_vs_income'] = (wide['Total staff costs'] - pension_adjust) / income
 
     # unrestricted reserves as % of income
     unreserves = wide['Income and expenditure reserve - unrestricted '] + wide['Revaluation reserve']
@@ -191,22 +197,24 @@ def key_financial_indicators(wide):
     total_staff_num = wide['Average staff numbers (FTE) as disclosed in accounts'] + \
         wide['Total staff numbers (FTE) as disclosed in accounts']
     kfi['avg_salary'] = wide['Total salaries and wages'] / total_staff_num
-    kfi['avg_remuneration'] = (wide['Staff costs'] - pension_adjust) / total_staff_num
+    kfi['avg_remuneration'] = (wide['Total staff costs'] - pension_adjust) / total_staff_num
     kfi['academic_salary'] = wide['Salaries and wages academic staff'] / wide['Average academic staff numbers (FTE)']
     kfi['ps_staff_salary'] = wide['Salaries and wages non-academic staff'] / wide['Average non-academic staff numbers (FTE)']
 
     # Other sources as % of total income
-    kfi['uk_vs_total_fees'] = wide['Total HE course fees'] / wide['Total UK fees']
+    kfi['total_vs_uk_fees'] = wide['Total HE course fees'] / wide['Total UK fees']
+    kfi['total_fees_vs_income'] = wide['Total HE course fees'] / income 
     kfi['fbg_vs_income'] = wide['Funding body grants'] / income
     kfi['research_vs_income'] = wide['Total research grants and contracts'] / income
     kfi['donate_vs_income'] = wide['Total donations and endowments'] / income
     kfi['reside_cater_vs_income'] = wide['Total residences and catering operations (including conferences)'] / income
     kfi['total_income'] = income
+    kfi['tuition_fees'] = wide['Total HE course fees']
 
     # Other expenditures
     kfi['finance_vs_expend'] = wide['Interest and other finance costs'] / expenditure
     kfi['depreciate_amort_vs_expend'] = wide['Depreciation and amortisation'] / expenditure
-    kfi['staff_vs_expend'] = (wide['Staff costs'] - pension_adjust) / expenditure
+    kfi['staff_vs_expend'] = (wide['Total staff costs'] - pension_adjust) / expenditure
     kfi['capital_vs_expend'] = wide['Total actual spend'] / expenditure
     kfi['total_expenditure'] = expenditure
 
@@ -214,8 +222,11 @@ def key_financial_indicators(wide):
     basic = wide['Basic salary paid before salary sacrifice arrangements'] + wide['Basic salary']
     remuneration = wide['Total remuneration (before salary sacrifice)']
     kfi['vc_bonus_vs_salary'] = wide['Performance related pay and other bonuses'] / basic
-    kfi['galt_index_salary'] = basic / kfi['avg_salary']
-    kfi['galt_index_total'] = remuneration / kfi['avg_remuneration']
+    kfi['vc_avg_salary'] = basic / kfi['avg_salary']
+    kfi['vc_avg_remunerate'] = remuneration / kfi['avg_remuneration']
+    # Median staff salary from the above
+    kfi['vc_median_salary'] = wide["Head of the provider's basic salary divided by the median pay (salary)"]
+    kfi['vc_median_remunerate'] = wide["Head of the provider's total remuneration divided by the median total remuneration."]
 
     return kfi
 
@@ -246,7 +257,7 @@ def main():
     pg = pg.rename(columns={'provider ukprn':'ukprn'})
     # add these to KFIs
     kfi = kfi.join(pg.set_index('ukprn'), on='ukprn', how='inner')
-    kfi.to_csv('kfi.csv')
+    kfi.to_csv('kfi.csv', index=False)
 
     return kfi
 
