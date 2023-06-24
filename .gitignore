@@ -1,2 +1,6 @@
 # ignore data files
 *.csv
+*.zip
+# ignore figures
+*.png
+*.jpeg
