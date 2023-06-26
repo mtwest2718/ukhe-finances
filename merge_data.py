@@ -202,7 +202,7 @@ def key_financial_indicators(wide):
     kfi['ps_staff_salary'] = wide['Salaries and wages non-academic staff'] / wide['Average non-academic staff numbers (FTE)']
 
     # Other sources as % of total income
-    kfi['total_vs_uk_fees'] = wide['Total HE course fees'] / wide['Total UK fees']
+    kfi['uk_vs_total_fees'] = wide['Total UK fees'] / wide['Total HE course fees']
     kfi['total_fees_vs_income'] = wide['Total HE course fees'] / income 
     kfi['fbg_vs_income'] = wide['Funding body grants'] / income
     kfi['research_vs_income'] = wide['Total research grants and contracts'] / income
