@@ -93,21 +93,22 @@ def filter_categories(tbl_id, unfiltered):
     return unfiltered[ unfiltered['category'].isin(categories) ]
 
 def parse_zip(tbl_id):
-    zip_file = f"table-{tbl_id}.zip"
+    zip_file = f"./data/table-{tbl_id}.zip"
 
     tbls = []
     # open zip file
     with zf(zip_file, 'r') as z:
+        z.extractall(path='./data')
+
         for fname in z.namelist():
-            z.extractall('.',members=[fname])
-            tbl = parse_table(tbl_id, csv_file=fname)
+            tbl = parse_table(tbl_id, csv_file='./data/'+fname)
             tbls.append(tbl)            
     # concat tables together
     return pd.concat(tbls, ignore_index=True)
 
 def parse_table(tbl_id, csv_file=None):
     if not csv_file:
-        csv_file = f"table-{tbl_id}.csv"
+        csv_file = f"./data/table-{tbl_id}.csv"
     print(csv_file)
 
     full_tbl = pd.read_csv(csv_file, skiprows=12)
