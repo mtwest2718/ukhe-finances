@@ -4,3 +4,5 @@
 # ignore figures
 *.png
 *.jpeg
+# ignore documents
+*.pdf
