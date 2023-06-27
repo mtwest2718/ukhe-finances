@@ -8,7 +8,10 @@ import pdb
 # Figure settings
 sb.set_theme()
 sb.set_context("talk")
-sb.set(rc={"figure.figsize":(16, 9)})
+sb.set(rc={
+    "figure.figsize":(16, 9), "figure.dpi":300, 
+    "savefig.dpi":300
+})
 
 # Key Financial Indicators CSV file
 csv_file = 'kfi.csv'
@@ -36,7 +39,7 @@ avg_salary.set(
     title='Average UKHE staff salary per year'
 )
 plt.legend(loc='lower right', title='Russell Group')
-plt.savefig('./figures/avg_salary.png', dpi=600)
+plt.savefig('./figures/avg_salary.png')
 plt.clf()
 
 
@@ -58,7 +61,7 @@ staff_income.set(
     title='What proportion of income is spent on staff costs'
 )
 plt.legend(loc='lower right', title='Russell Group')
-plt.savefig('./figures/staff_vs_income.png', dpi=600)
+plt.savefig('./figures/staff_vs_income.png')
 plt.clf()
 
 
@@ -80,7 +83,7 @@ staff_expend.set(
     title='What proportion of annual expenditure is staff costs'
 )
 plt.legend(loc='lower right', title='Russell Group')
-plt.savefig('./figures/staff_vs_expend.png', dpi=600)
+plt.savefig('./figures/staff_vs_expend.png')
 plt.clf()
 
 
@@ -102,7 +105,7 @@ surplus_income.set(
     title='How big is the annual surplus relative to total income?'
 )
 plt.legend(loc='lower right', title='Russell Group')
-plt.savefig('./figures/surplus_vs_income.png', dpi=600)
+plt.savefig('./figures/surplus_vs_income.png')
 plt.clf()
 
 
@@ -132,7 +135,7 @@ tuition_fees.set(
     title='How has UKHE income from tuition fees changed over time?'
 )
 plt.legend(loc='upper left', title='Russell Group')
-plt.savefig('./figures/total_tuition_fees.png', dpi=600)
+plt.savefig('./figures/total_tuition_fees.png')
 plt.clf()
 
 
@@ -153,7 +156,7 @@ fee_income.set(
     title='Contribution of student fees to UKHE income'
 )
 plt.legend(loc='lower right', title='Russell Group')
-plt.savefig('./figures/fees_vs_income.png', dpi=600)
+plt.savefig('./figures/fees_vs_income.png')
 plt.clf()
 
 
@@ -175,7 +178,7 @@ capital_expend.set(
     title='What proportion of annual expenditure is on Capital Costs?'
 )
 plt.legend(loc='upper right', title='Russell Group')
-plt.savefig('./figures/capital_expenditure.png', dpi=600)
+plt.savefig('./figures/capital_expenditure.png')
 plt.clf()
 
 
@@ -197,7 +200,7 @@ vc.set(
     title="How does the VC's remuneration compare to the rest of staff?"
 )
 plt.legend(loc='lower right', title='Russell Group')
-plt.savefig('./figures/vc_compensation.png', dpi=600)
+plt.savefig('./figures/vc_compensation.png')
 plt.clf()
 
 
@@ -224,5 +227,5 @@ plt.plot(
     color='black', linestyle='dashed', linewidth=2, label='Equality'
 )
 plt.legend(loc='upper right', title='Russell Group')
-plt.savefig('./figures/compare_salaries.png', dpi=600)
+plt.savefig('./figures/compare_salaries.png')
 plt.clf()
