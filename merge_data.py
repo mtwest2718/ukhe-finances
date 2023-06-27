@@ -253,7 +253,7 @@ def main():
     kfi = kfi.round(3)
 
     # Get provider group IDs
-    pg = pd.read_csv('provider_groups.csv')
+    pg = pd.read_csv('./data/provider_groups.csv')
     pg = pg.rename(str.lower, axis='columns')
     pg = pg.rename(columns={'provider ukprn':'ukprn'})
     # add these to KFIs
