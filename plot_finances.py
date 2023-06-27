@@ -6,12 +6,11 @@ import matplotlib.pyplot as plt
 import pdb
 
 # Figure settings
-sb.set_theme()
-sb.set_context("talk")
-sb.set(rc={
-    "figure.figsize":(16, 9), "figure.dpi":300, 
-    "savefig.dpi":300
-})
+sb.set_theme(
+    context="talk",
+    style="whitegrid",
+    rc={"figure.figsize":(16, 9), "figure.dpi":300, "savefig.dpi":300}
+)
 
 # Key Financial Indicators CSV file
 csv_file = 'kfi.csv'
@@ -87,7 +86,7 @@ plt.savefig('./figures/staff_vs_expend.png')
 plt.clf()
 
 
-print("\tWhat proportion of total income is spent on Staff Costs")
+print("\tHow big is the annual surplus, scaled by the total income")
 surplus_income = sb.swarmplot(
     data=tbl,
     x='academic year', y='surplus_vs_income', hue='russell group filter',
@@ -98,13 +97,13 @@ sb.lineplot(
     x='academic year', y='surplus_vs_income',
     color='g', label='Exeter', zorder=2, marker='o', markersize=10
 )
-surplus_income.set_ylim(-0.3,0.3)
+surplus_income.set_ylim(-0.2,0.25)
 surplus_income.set(
     xlabel='Academic Year', 
     ylabel='Proportion of Total Income',
     title='How big is the annual surplus relative to total income?'
 )
-plt.legend(loc='lower right', title='Russell Group')
+plt.legend(loc='lower left', title='Russell Group')
 plt.savefig('./figures/surplus_vs_income.png')
 plt.clf()
 
@@ -196,7 +195,7 @@ sb.lineplot(
 vc.set_ylim(0,12)
 vc.set(
     xlabel='Academic Year', 
-    ylabel='Ratio of VC to avg-staff member total compentation',
+    ylabel='Ratio of VC to staff average',
     title="How does the VC's remuneration compare to the rest of staff?"
 )
 plt.legend(loc='lower right', title='Russell Group')
@@ -205,13 +204,13 @@ plt.clf()
 
 
 print("\tComparing average salaries for academics and ps-staff")
-staff_salary = sb.lineplot(
-    data=tbl[(tbl['academic_salary']!=0) & (tbl['ps_staff_salary']!=0)], 
+staff_salary = sb.scatterplot(
+    data=tbl[tbl['academic year']=='2021/22'], 
     x='academic_salary', y='ps_staff_salary', hue='russell group filter',
-    zorder=1, legend=True, marker='o', units='ukprn', estimator=None
+    zorder=1, legend=True
 )
 sb.scatterplot(
-    data=exeter[(exeter['academic_salary']!=0) & (exeter['ps_staff_salary']!=0)], ax=staff_salary,
+    data=exeter[exeter['academic year']=='2021/22'], ax=staff_salary,
     x='academic_salary', y='ps_staff_salary',
     color='g', s=200, label='Exeter', zorder=2
 )
@@ -220,7 +219,7 @@ staff_salary.set_xlim(20,80)
 staff_salary.set(
     xlabel='Average Salary (k£) for Academic Staff', 
     ylabel='Average Salary (k£) for Professional Services',
-    title='Comparing Salaries between sub-sectors in UKHE'
+    title='Comparing Salaries between Academic and PS Staff for 2021/22'
 )
 plt.plot(
     [20, 80], [20, 80], 
@@ -229,3 +228,98 @@ plt.plot(
 plt.legend(loc='upper right', title='Russell Group')
 plt.savefig('./figures/compare_salaries.png')
 plt.clf()
+
+def net_liquidity_days(tbl):
+    print("\tNet Liquidity Days")
+    surplus_income = sb.swarmplot(
+        data=tbl,
+        x='academic year', y='net_liquidity_days', hue='russell group filter',
+        dodge=True, zorder=1, warn_thresh=0.2
+    )
+    sb.lineplot(
+        data=exeter, ax=surplus_income,
+        x='academic year', y='net_liquidity_days',
+        color='g', label='Exeter', zorder=2, marker='o', markersize=10
+    )
+    surplus_income.axhline(60, label='Lower Bound', color='black', linestyle='dashed')
+    surplus_income.set_ylim(-10,600)
+    surplus_income.set(
+        xlabel='Academic Year', 
+        ylabel='Days of Operating Cost Coverage',
+        title='A measure of institutions abilitity to costs from liquid assets'
+    )
+    plt.legend(loc='upper left', title='Russell Group')
+    plt.savefig('./figures/net_liquidity_days.png')
+    plt.clf()
+
+def operating_cash_flow(tbl):
+    print("\tNet cash flow")
+    surplus_income = sb.swarmplot(
+        data=tbl,
+        x='academic year', y='ops_cash_vs_income', hue='russell group filter',
+        dodge=True, zorder=1, warn_thresh=0.2
+    )
+    sb.lineplot(
+        data=exeter, ax=surplus_income,
+        x='academic year', y='ops_cash_vs_income',
+        color='g', label='Exeter', zorder=2, marker='o', markersize=10
+    )
+    surplus_income.set_ylim(-0.2,0.4)
+    surplus_income.set(
+        xlabel='Academic Year', 
+        ylabel='Proportion of Total Income',
+        title='What is the net cash flow from Operating Actives relative to income?'
+    )
+    plt.legend(loc='upper left', title='Russell Group')
+    plt.savefig('./figures/opscash_vs_income.png')
+    plt.clf()
+
+def eoy_cash_equivalents(tbl):
+    print("\tEnd of year cash equivalents")
+    ax = sb.swarmplot(
+        data=tbl,
+        x='academic year', y='ops_cash_vs_income', hue='russell group filter',
+        dodge=True, zorder=1, warn_thresh=0.2
+    )
+    sb.lineplot(
+        data=exeter, ax=ax,
+        x='academic year', y='ops_cash_vs_income',
+        color='g', label='Exeter', zorder=2, marker='o', markersize=10
+    )
+    #surplus_income.set_ylim(-0.2,0.4)
+    ax.set(
+        xlabel='Academic Year', 
+        ylabel='Proportion of Total Income',
+        title='What is the net cash flow from Operating Actives relative to income?'
+    )
+    plt.legend(loc='upper left', title='Russell Group')
+    plt.savefig('./figures/opscash_vs_income.png')
+    plt.clf()
+
+def comparing_surplus_measures(tbl, acyear='2021/22'):
+    print("\tAnnual surplus measures for "+acyear)
+    staff_salary = sb.scatterplot(
+        data=tbl[tbl['academic year']==acyear], 
+        x='ops_cash_vs_income', y='surplus_vs_income', hue='russell group filter',
+        zorder=1, legend=True
+    )
+    sb.scatterplot(
+        data=exeter[exeter['academic year']==acyear], ax=staff_salary,
+        x='ops_cash_vs_income', y='surplus_vs_income',
+        color='g', s=200, label='Exeter', zorder=2
+    )
+    staff_salary.set_ylim(-0.2,0.25)
+    staff_salary.set(
+        xlabel='Net cash flow from operating activities', 
+        ylabel='Total annual surplus',
+        title='Financial surplus measures relative to total income in '+acyear,
+    )
+    plt.legend(loc='upper left', title='Russell Group')
+    plt.savefig('./figures/compare_surplus.png')
+    plt.clf()
+
+# running the plotting functions
+operating_cash_flow(tbl)
+comparing_surplus_measures(tbl)
+net_liquidity_days(tbl)
+
