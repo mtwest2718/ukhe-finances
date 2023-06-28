@@ -139,20 +139,20 @@ plt.clf()
 
 
 print("\tUnderstand what portion of income comes from Student Fees")
-fee_income = sb.lineplot(
-    data=tbl, 
+fee_income = sb.scatterplot(
+    data=tbl[ tbl['academic year']=='2021/22' ], 
     x='total_fees_vs_income', y='uk_vs_total_fees', hue='russell group filter',
-    zorder=1, legend=True, marker='o', units='ukprn', estimator=None
+    zorder=1, legend=True
 )
 sb.scatterplot(
-    data=exeter, ax=fee_income,
+    data=exeter[ exeter['academic year']=='2021/22' ], ax=fee_income,
     x='total_fees_vs_income', y='uk_vs_total_fees',
     color='g', s=200, label='Exeter', zorder=2
 )
 fee_income.set(
     xlabel='Proportion of income from student fees', 
     ylabel='Proportion of fee income from UK students',
-    title='Contribution of student fees to UKHE income'
+    title='Contribution of student fees to UKHE income in 2021/22'
 )
 plt.legend(loc='lower right', title='Russell Group')
 plt.savefig('./figures/fees_vs_income.png')
