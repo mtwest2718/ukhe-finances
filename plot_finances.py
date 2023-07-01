@@ -356,12 +356,23 @@ def main():
     # Also pulling out just the data for the University of Exeter
     uoe = 10007792
 
-    # running the plotting functions
-    compare_staff_salary(tbl)
-    operating_cash_flow(tbl)
-    comparing_surplus_measures(tbl)
+    print('Swarm Plots')
     net_liquidity_days(tbl)
+    operating_cash_flow(tbl)
+    eoy_cash_equivalents(tbl)
+    galt_index(tbl)
+    capital_projects(tbl)
+    staffcosts_income(tbl)
+    staffcosts_expenditure(tbl)
+    average_salary(tbl)
 
+    print('Scatter Plots')
+    compare_staff_salary(tbl)
+    comparing_surplus_measures(tbl)
+    tuition_fee_proportion(tbl)
+
+    print('Line Plots') 
+    change_tuition_fees(tbl)
 
 if __name__ == "__main__":
     main()
