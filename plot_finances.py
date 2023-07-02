@@ -30,7 +30,7 @@ def average_salary(tbl, ukprn=10007792, outdir=None):
         title='Average UKHE staff salary per year'
     )
     plt.legend(loc='lower right', title='Russell Group')
-    plt.savefig('./figures/avg_salary.png')
+    plt.savefig(outdir.joinpath('avg_salary.png'))
     plt.clf()
 
 def staffcosts_income(tbl, ukprn=10007792, outdir=None):
@@ -55,7 +55,7 @@ def staffcosts_income(tbl, ukprn=10007792, outdir=None):
         title='What proportion of income is spent on staff costs'
     )
     plt.legend(loc='lower right', title='Russell Group')
-    plt.savefig('./figures/staff_vs_income.png')
+    plt.savefig(outdir.joinpath('staff_vs_income.png'))
     plt.clf()
 
 def staffcosts_expenditure(tbl, ukprn=10007792, outdir=None):
@@ -80,7 +80,7 @@ def staffcosts_expenditure(tbl, ukprn=10007792, outdir=None):
         title='What proportion of annual expenditure is staff costs'
     )
     plt.legend(loc='lower right', title='Russell Group')
-    plt.savefig('./figures/staff_vs_expend.png')
+    plt.savefig(outdir.joinpath('staff_vs_expend.png'))
     plt.clf()
 
 def annual_surplus_income(tbl, ukprn=10007792, outdir=None):
@@ -105,7 +105,7 @@ def annual_surplus_income(tbl, ukprn=10007792, outdir=None):
         title='How big is the annual surplus relative to total income?'
     )
     plt.legend(loc='lower left', title='Russell Group')
-    plt.savefig('./figures/surplus_vs_income.png')
+    plt.savefig(outdir.joinpath('surplus_vs_income.png'))
     plt.clf()
 
 def change_tuition_fees(tbl, ukprn=10007792, outdir=None):
@@ -135,7 +135,7 @@ def change_tuition_fees(tbl, ukprn=10007792, outdir=None):
         title='How has UKHE income from tuition fees changed over time?'
     )
     plt.legend(loc='upper left', title='Russell Group')
-    plt.savefig('./figures/total_tuition_fees.png')
+    plt.savefig(outdir.joinpath('total_tuition_fees.png'))
     plt.clf()
 
 def tuition_fee_proportion(tbl, ukprn=10007792, outdir=None):
@@ -159,7 +159,7 @@ def tuition_fee_proportion(tbl, ukprn=10007792, outdir=None):
         title='Contribution of student fees to UKHE income in 2021/22'
     )
     plt.legend(loc='lower right', title='Russell Group')
-    plt.savefig('./figures/fees_vs_income.png')
+    plt.savefig(outdir.joinpath('fees_vs_income.png'))
     plt.clf()
 
 def capital_projects(tbl, ukprn=10007792, outdir=None):
@@ -184,7 +184,7 @@ def capital_projects(tbl, ukprn=10007792, outdir=None):
         title='What proportion of annual expenditure is on Capital Costs?'
     )
     plt.legend(loc='upper right', title='Russell Group')
-    plt.savefig('./figures/capital_expenditure.png')
+    plt.savefig(outdir.joinpath('capital_expenditure.png'))
     plt.clf()
 
 def galt_index(tbl, ukprn=10007792, outdir=None):
@@ -209,7 +209,7 @@ def galt_index(tbl, ukprn=10007792, outdir=None):
         title="How does the VC's remuneration compare to the rest of staff?"
     )
     plt.legend(loc='lower right', title='Russell Group')
-    plt.savefig('./figures/vc_compensation.png')
+    plt.savefig(outdir.joinpath('vc_compensation.png'))
     plt.clf()
 
 
@@ -240,7 +240,7 @@ def compare_staff_salary(tbl, acyear='2021/22', ukprn=10007792, outdir=None):
         color='black', linestyle='dashed', linewidth=2, label='Equality'
     )
     plt.legend(loc='upper right', title='Russell Group')
-    plt.savefig('./figures/compare_salaries.png')
+    plt.savefig(outdir.joinpath('compare_salaries.png'))
     plt.clf()
 
 def net_liquidity_days(tbl, ukprn=10007792, outdir=None):
@@ -266,7 +266,7 @@ def net_liquidity_days(tbl, ukprn=10007792, outdir=None):
         title='A measure of institutions abilitity to costs from liquid assets'
     )
     plt.legend(loc='upper left', title='Russell Group')
-    plt.savefig('./figures/net_liquidity_days.png')
+    plt.savefig(outdir.joinpath('net_liquidity_days.png'))
     plt.clf()
 
 def operating_cash_flow(tbl, ukprn=10007792, outdir=None):
@@ -291,7 +291,7 @@ def operating_cash_flow(tbl, ukprn=10007792, outdir=None):
         title='What is the net cash flow from Operating Actives relative to income?'
     )
     plt.legend(loc='upper left', title='Russell Group')
-    plt.savefig('./figures/opscash_vs_income.png')
+    plt.savefig(outdir.joinpath('opscash_vs_income.png'))
     plt.clf()
 
 def eoy_cash_equivalents(tbl, ukprn=10007792, outdir=None):
@@ -315,7 +315,7 @@ def eoy_cash_equivalents(tbl, ukprn=10007792, outdir=None):
         title='What is the net cash flow from Operating Actives relative to income?'
     )
     plt.legend(loc='upper left', title='Russell Group')
-    plt.savefig('./figures/opscash_vs_income.png')
+    plt.savefig(outdir.joinpath('opscash_vs_income.png'))
     plt.clf()
 
 def comparing_surplus_measures(tbl, acyear='2021/22', ukprn=10007792, outdir=None):
@@ -340,7 +340,7 @@ def comparing_surplus_measures(tbl, acyear='2021/22', ukprn=10007792, outdir=Non
         title='Financial surplus measures relative to total income in '+acyear,
     )
     plt.legend(loc='upper left', title='Russell Group')
-    plt.savefig('./figures/compare_surplus.png')
+    plt.savefig(outdir.joinpath('compare_surplus.png'))
     plt.clf()
 
 
@@ -362,6 +362,9 @@ def main():
         sys.exit(f"The dir <{args.figure_dir}> does not exist.")
     if args.ukprn not in tbl['ukprn'].values:
         sys.exit(f"{args.ukprn} is not a valid UK Provider Number.")
+    else:
+        uni = tbl.loc[tbl['ukprn']==args.ukprn, 'he provider'].unique()[0]
+        print(f"{args.ukprn} corresponds to {uni}")
 
     # Figure settings
     sb.set_theme(
@@ -379,6 +382,7 @@ def main():
     staffcosts_income(tbl, ukprn=args.ukprn, outdir=args.figure_dir)
     staffcosts_expenditure(tbl, ukprn=args.ukprn, outdir=args.figure_dir)
     average_salary(tbl, ukprn=args.ukprn, outdir=args.figure_dir)
+    annual_surplus_income(tbl, ukprn=args.ukprn, outdir=args.figure_dir)
 
     print('Scatter Plots')
     compare_staff_salary(tbl, ukprn=args.ukprn, outdir=args.figure_dir)
