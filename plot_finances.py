@@ -353,26 +353,26 @@ def main():
     # Key Financial Indicators CSV file
     csv_file = 'kfi.csv'
     tbl = pd.read_csv(csv_file)
-    # Also pulling out just the data for the University of Exeter
-    uoe = 10007792
+    # UK PRovider Number (for Exeter)
+    ukprn = 10007792
 
     print('Swarm Plots')
-    net_liquidity_days(tbl)
-    operating_cash_flow(tbl)
-    eoy_cash_equivalents(tbl)
-    galt_index(tbl)
-    capital_projects(tbl)
-    staffcosts_income(tbl)
-    staffcosts_expenditure(tbl)
-    average_salary(tbl)
+    net_liquidity_days(tbl, ukprn=ukprn)
+    operating_cash_flow(tbl, ukprn=ukprn)
+    eoy_cash_equivalents(tbl, ukprn=ukprn)
+    galt_index(tbl, ukprn=ukprn)
+    capital_projects(tbl, ukprn=ukprn)
+    staffcosts_income(tbl, ukprn=ukprn)
+    staffcosts_expenditure(tbl, ukprn=ukprn)
+    average_salary(tbl, ukprn=ukprn)
 
     print('Scatter Plots')
-    compare_staff_salary(tbl)
-    comparing_surplus_measures(tbl)
-    tuition_fee_proportion(tbl)
+    compare_staff_salary(tbl, ukprn=ukprn)
+    comparing_surplus_measures(tbl, ukprn=ukprn)
+    tuition_fee_proportion(tbl, ukprn=ukprn)
 
     print('Line Plots') 
-    change_tuition_fees(tbl)
+    change_tuition_fees(tbl, ukprn=ukprn)
 
 if __name__ == "__main__":
     main()
