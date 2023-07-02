@@ -4,9 +4,11 @@ import pandas as pd
 import seaborn as sb
 import matplotlib.pyplot as plt
 import pdb
+import argparse
+import pathlib
+import sys
 
-
-def average_salary(tbl, ukprn=10007792):
+def average_salary(tbl, ukprn=10007792, outdir=None):
     print("\tAnnual average salary for staff in k£")
 
     # Get details for single uni
@@ -31,7 +33,7 @@ def average_salary(tbl, ukprn=10007792):
     plt.savefig('./figures/avg_salary.png')
     plt.clf()
 
-def staffcosts_income(tbl, ukprn=10007792):
+def staffcosts_income(tbl, ukprn=10007792, outdir=None):
     print("\tProportion of Income spent on Staff Costs")
 
     # Get details for single uni
@@ -56,7 +58,7 @@ def staffcosts_income(tbl, ukprn=10007792):
     plt.savefig('./figures/staff_vs_income.png')
     plt.clf()
 
-def staffcosts_expenditure(tbl, ukprn=10007792):
+def staffcosts_expenditure(tbl, ukprn=10007792, outdir=None):
     print("\tWhat proportion of Total Expenditure is Staff Costs")
 
     # Get details for single uni
@@ -81,7 +83,7 @@ def staffcosts_expenditure(tbl, ukprn=10007792):
     plt.savefig('./figures/staff_vs_expend.png')
     plt.clf()
 
-def annual_surplus_income(tbl, ukprn=10007792):
+def annual_surplus_income(tbl, ukprn=10007792, outdir=None):
     print("\tHow big is the annual surplus, scaled by the total income")
 
     # Get details for single uni
@@ -106,7 +108,7 @@ def annual_surplus_income(tbl, ukprn=10007792):
     plt.savefig('./figures/surplus_vs_income.png')
     plt.clf()
 
-def change_tuition_fees(tbl, ukprn=10007792):
+def change_tuition_fees(tbl, ukprn=10007792, outdir=None):
     # rescale tuition fees from 2016/17 value to compare growth levels
     w = pd.pivot_table(tbl, values=['tuition_fees'], columns=['academic year'], index=['ukprn','russell group filter'])
     norm = w.div(w[('tuition_fees','2016/17')], axis=0, level=1)
@@ -136,7 +138,7 @@ def change_tuition_fees(tbl, ukprn=10007792):
     plt.savefig('./figures/total_tuition_fees.png')
     plt.clf()
 
-def tuition_fee_proportion(tbl, ukprn=10007792):
+def tuition_fee_proportion(tbl, ukprn=10007792, outdir=None):
     print("\tUnderstand what portion of income comes from Student Fees")
 
     # Get details for single uni
@@ -160,7 +162,7 @@ def tuition_fee_proportion(tbl, ukprn=10007792):
     plt.savefig('./figures/fees_vs_income.png')
     plt.clf()
 
-def capital_projects(tbl, ukprn=10007792):
+def capital_projects(tbl, ukprn=10007792, outdir=None):
     print("\tHow of total expenditures is spent on capital projects")
 
     # Get details for single uni
@@ -185,7 +187,7 @@ def capital_projects(tbl, ukprn=10007792):
     plt.savefig('./figures/capital_expenditure.png')
     plt.clf()
 
-def galt_index(tbl, ukprn=10007792):
+def galt_index(tbl, ukprn=10007792, outdir=None):
     print("\tRatio of VC remuneration to that average remuneration of staff.")
 
     # Get details for single uni
@@ -211,7 +213,7 @@ def galt_index(tbl, ukprn=10007792):
     plt.clf()
 
 
-def compare_staff_salary(tbl, acyear='2021/22', ukprn=10007792):
+def compare_staff_salary(tbl, acyear='2021/22', ukprn=10007792, outdir=None):
     print("\tComparing average salaries for academics and ps-staff")
 
     # Get details for single uni
@@ -241,7 +243,7 @@ def compare_staff_salary(tbl, acyear='2021/22', ukprn=10007792):
     plt.savefig('./figures/compare_salaries.png')
     plt.clf()
 
-def net_liquidity_days(tbl, ukprn=10007792):
+def net_liquidity_days(tbl, ukprn=10007792, outdir=None):
     print("\tNet Liquidity Days")
 
     # Get details for single uni
@@ -267,7 +269,7 @@ def net_liquidity_days(tbl, ukprn=10007792):
     plt.savefig('./figures/net_liquidity_days.png')
     plt.clf()
 
-def operating_cash_flow(tbl, ukprn=10007792):
+def operating_cash_flow(tbl, ukprn=10007792, outdir=None):
     print("\tNet cash flow")
 
     # Get details for single uni
@@ -292,7 +294,7 @@ def operating_cash_flow(tbl, ukprn=10007792):
     plt.savefig('./figures/opscash_vs_income.png')
     plt.clf()
 
-def eoy_cash_equivalents(tbl, ukprn=10007792):
+def eoy_cash_equivalents(tbl, ukprn=10007792, outdir=None):
     print("\tEnd of year cash equivalents")
 
     # Get details for single uni
@@ -316,7 +318,7 @@ def eoy_cash_equivalents(tbl, ukprn=10007792):
     plt.savefig('./figures/opscash_vs_income.png')
     plt.clf()
 
-def comparing_surplus_measures(tbl, acyear='2021/22', ukprn=10007792):
+def comparing_surplus_measures(tbl, acyear='2021/22', ukprn=10007792, outdir=None):
     print("\tAnnual surplus measures for "+acyear)
 
     # Get details for single uni
@@ -343,6 +345,24 @@ def comparing_surplus_measures(tbl, acyear='2021/22', ukprn=10007792):
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-i', '--input-csv', type=argparse.FileType('r'), 
+        help="Path to CSV data that the plots are generated from")
+    parser.add_argument('-f', '--figure-dir', type=pathlib.Path,
+        help="The directory path where the figures should be saved")
+    parser.add_argument('-u', '--ukprn', type=int, default=10007792,
+        help="The UK PRovider Number for the institution of interest")
+    args = parser.parse_args() 
+
+    # Key Financial Indicators CSV file
+    tbl = pd.read_csv(args.input_csv)
+
+    # Checking input arguments
+    if not args.figure_dir.exists():
+        sys.exit(f"The dir <{args.figure_dir}> does not exist.")
+    if args.ukprn not in tbl['ukprn'].values:
+        sys.exit(f"{args.ukprn} is not a valid UK Provider Number.")
+
     # Figure settings
     sb.set_theme(
         context="talk",
@@ -350,29 +370,23 @@ def main():
         rc={"figure.figsize":(16, 9), "figure.dpi":300, "savefig.dpi":300}
     )
 
-    # Key Financial Indicators CSV file
-    csv_file = 'kfi.csv'
-    tbl = pd.read_csv(csv_file)
-    # UK PRovider Number (for Exeter)
-    ukprn = 10007792
-
     print('Swarm Plots')
-    net_liquidity_days(tbl, ukprn=ukprn)
-    operating_cash_flow(tbl, ukprn=ukprn)
-    eoy_cash_equivalents(tbl, ukprn=ukprn)
-    galt_index(tbl, ukprn=ukprn)
-    capital_projects(tbl, ukprn=ukprn)
-    staffcosts_income(tbl, ukprn=ukprn)
-    staffcosts_expenditure(tbl, ukprn=ukprn)
-    average_salary(tbl, ukprn=ukprn)
+    net_liquidity_days(tbl, ukprn=args.ukprn, outdir=args.figure_dir)
+    operating_cash_flow(tbl, ukprn=args.ukprn, outdir=args.figure_dir)
+    eoy_cash_equivalents(tbl, ukprn=args.ukprn, outdir=args.figure_dir)
+    galt_index(tbl, ukprn=args.ukprn, outdir=args.figure_dir)
+    capital_projects(tbl, ukprn=args.ukprn, outdir=args.figure_dir)
+    staffcosts_income(tbl, ukprn=args.ukprn, outdir=args.figure_dir)
+    staffcosts_expenditure(tbl, ukprn=args.ukprn, outdir=args.figure_dir)
+    average_salary(tbl, ukprn=args.ukprn, outdir=args.figure_dir)
 
     print('Scatter Plots')
-    compare_staff_salary(tbl, ukprn=ukprn)
-    comparing_surplus_measures(tbl, ukprn=ukprn)
-    tuition_fee_proportion(tbl, ukprn=ukprn)
+    compare_staff_salary(tbl, ukprn=args.ukprn, outdir=args.figure_dir)
+    comparing_surplus_measures(tbl, ukprn=args.ukprn, outdir=args.figure_dir)
+    tuition_fee_proportion(tbl, ukprn=args.ukprn, outdir=args.figure_dir)
 
     print('Line Plots') 
-    change_tuition_fees(tbl, ukprn=ukprn)
+    change_tuition_fees(tbl, ukprn=args.ukprn, outdir=args.figure_dir)
 
 if __name__ == "__main__":
     main()
