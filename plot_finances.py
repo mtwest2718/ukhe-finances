@@ -13,6 +13,8 @@ def average_salary(tbl, ukprn=10007792, outdir=None):
 
     # Get details for single uni
     uni = tbl[tbl['ukprn']==ukprn]
+    name = uni['he provider'].unique()[0]
+
     avg_salary = sb.swarmplot(
         data=tbl,
         x='academic year', y='avg_salary', hue='russell group filter',
@@ -21,7 +23,7 @@ def average_salary(tbl, ukprn=10007792, outdir=None):
     sb.lineplot(
         data=uni, ax=avg_salary,
         x='academic year', y='avg_salary',
-        color='g', label='Exeter', zorder=2, marker='o', markersize=10
+        color='g', label=name, zorder=2, marker='o', markersize=10
     )
     avg_salary.set_ylim(25,60)
     avg_salary.set(
@@ -38,6 +40,8 @@ def staffcosts_income(tbl, ukprn=10007792, outdir=None):
 
     # Get details for single uni
     uni = tbl[tbl['ukprn']==ukprn]
+    name = uni['he provider'].unique()[0]
+
     staff_income = sb.swarmplot(
         data=tbl,
         x='academic year', y='staff_vs_income', hue='russell group filter',
@@ -46,7 +50,7 @@ def staffcosts_income(tbl, ukprn=10007792, outdir=None):
     sb.lineplot(
         data=uni, ax=staff_income,
         x='academic year', y='staff_vs_income',
-        color='g', label='Exeter', zorder=2, marker='o', markersize=10
+        color='g', label=name, zorder=2, marker='o', markersize=10
     )
     staff_income.set_ylim(0.1,0.8)
     staff_income.set(
@@ -63,6 +67,8 @@ def staffcosts_expenditure(tbl, ukprn=10007792, outdir=None):
 
     # Get details for single uni
     uni = tbl[tbl['ukprn']==ukprn]
+    name = uni['he provider'].unique()[0]
+
     staff_expend = sb.swarmplot(
         data=tbl,
         x='academic year', y='staff_vs_expend', hue='russell group filter',
@@ -71,7 +77,7 @@ def staffcosts_expenditure(tbl, ukprn=10007792, outdir=None):
     sb.lineplot(
         data=uni, ax=staff_expend,
         x='academic year', y='staff_vs_expend',
-        color='g', label='Exeter', zorder=2, marker='o', markersize=10
+        color='g', label=name, zorder=2, marker='o', markersize=10
     )
     staff_expend.set_ylim(0.1,0.8)
     staff_expend.set(
@@ -88,6 +94,8 @@ def annual_surplus_income(tbl, ukprn=10007792, outdir=None):
 
     # Get details for single uni
     uni = tbl[tbl['ukprn']==ukprn]
+    name = uni['he provider'].unique()[0]
+
     surplus_income = sb.swarmplot(
         data=tbl,
         x='academic year', y='surplus_vs_income', hue='russell group filter',
@@ -96,7 +104,7 @@ def annual_surplus_income(tbl, ukprn=10007792, outdir=None):
     sb.lineplot(
         data=uni, ax=surplus_income,
         x='academic year', y='surplus_vs_income',
-        color='g', label='Exeter', zorder=2, marker='o', markersize=10
+        color='g', label=name, zorder=2, marker='o', markersize=10
     )
     surplus_income.set_ylim(-0.2,0.25)
     surplus_income.set(
@@ -109,6 +117,9 @@ def annual_surplus_income(tbl, ukprn=10007792, outdir=None):
     plt.clf()
 
 def change_tuition_fees(tbl, ukprn=10007792, outdir=None):
+    # Get details for single uni
+    uni_name = tbl.loc[tbl['ukprn']==ukprn, 'he provider'].unique()[0]
+
     # rescale tuition fees from 2016/17 value to compare growth levels
     w = pd.pivot_table(tbl, values=['tuition_fees'], columns=['academic year'], index=['ukprn','russell group filter'])
     norm = w.div(w[('tuition_fees','2016/17')], axis=0, level=1)
@@ -126,7 +137,7 @@ def change_tuition_fees(tbl, ukprn=10007792, outdir=None):
     sb.scatterplot(
         data=pct.loc[ukprn], ax=tuition_fees,
         x='academic year', y='tuition_fees',
-        color='g', s=200, label='Exeter', zorder=2
+        color='g', s=200, label=uni_name, zorder=2
     )
     tuition_fees.set_ylim(-25,150)
     tuition_fees.set(
@@ -143,6 +154,8 @@ def tuition_fee_proportion(tbl, ukprn=10007792, outdir=None):
 
     # Get details for single uni
     uni = tbl[tbl['ukprn']==ukprn]
+    name = uni['he provider'].unique()[0]
+
     fee_income = sb.scatterplot(
         data=tbl[ tbl['academic year']=='2021/22' ], 
         x='total_fees_vs_income', y='uk_vs_total_fees', hue='russell group filter',
@@ -151,7 +164,7 @@ def tuition_fee_proportion(tbl, ukprn=10007792, outdir=None):
     sb.scatterplot(
         data=uni[ uni['academic year']=='2021/22' ], ax=fee_income,
         x='total_fees_vs_income', y='uk_vs_total_fees',
-        color='g', s=200, label='Exeter', zorder=2
+        color='g', s=200, label=name, zorder=2
     )
     fee_income.set(
         xlabel='Proportion of income from student fees', 
@@ -167,6 +180,8 @@ def capital_projects(tbl, ukprn=10007792, outdir=None):
 
     # Get details for single uni
     uni = tbl[tbl['ukprn']==ukprn]
+    name = uni['he provider'].unique()[0]
+
     capital_expend = sb.swarmplot(
         data=tbl,
         x='academic year', y='capital_vs_expend', hue='russell group filter',
@@ -175,7 +190,7 @@ def capital_projects(tbl, ukprn=10007792, outdir=None):
     sb.lineplot(
         data=uni, ax=capital_expend,
         x='academic year', y='capital_vs_expend',
-        color='g', label='Exeter', zorder=2, marker='o', markersize=10
+        color='g', label=name, zorder=2, marker='o', markersize=10
     )
     capital_expend.set_ylim(0,0.8)
     capital_expend.set(
@@ -192,6 +207,8 @@ def galt_index(tbl, ukprn=10007792, outdir=None):
 
     # Get details for single uni
     uni = tbl[tbl['ukprn']==ukprn]
+    name = uni['he provider'].unique()[0]
+
     vc = sb.swarmplot(
         data=tbl,
         x='academic year', y='vc_avg_remunerate', hue='russell group filter',
@@ -200,7 +217,7 @@ def galt_index(tbl, ukprn=10007792, outdir=None):
     sb.lineplot(
         data=uni, ax=vc,
         x='academic year', y='vc_avg_remunerate',
-        color='g', label='Exeter', zorder=2, marker='o', markersize=10
+        color='g', label=name, zorder=2, marker='o', markersize=10
     )
     vc.set_ylim(0,12)
     vc.set(
@@ -218,6 +235,8 @@ def compare_staff_salary(tbl, acyear='2021/22', ukprn=10007792, outdir=None):
 
     # Get details for single uni
     uni = tbl[tbl['ukprn']==ukprn]
+    name = uni['he provider'].unique()[0]
+
     ax = sb.scatterplot(
         data=tbl[tbl['academic year']==acyear], 
         x='academic_salary', y='ps_staff_salary', hue='russell group filter',
@@ -226,7 +245,7 @@ def compare_staff_salary(tbl, acyear='2021/22', ukprn=10007792, outdir=None):
     sb.scatterplot(
         data=uni[ uni['academic year']==acyear ], ax=ax,
         x='academic_salary', y='ps_staff_salary',
-        color='g', s=200, label='Exeter', zorder=2
+        color='g', s=200, label=name, zorder=2
     )
     ax.set_ylim(20,80)
     ax.set_xlim(20,80)
@@ -248,6 +267,8 @@ def net_liquidity_days(tbl, ukprn=10007792, outdir=None):
 
     # Get details for single uni
     uni = tbl[tbl['ukprn']==ukprn]
+    name = uni['he provider'].unique()[0]
+
     surplus_income = sb.swarmplot(
         data=tbl,
         x='academic year', y='net_liquidity_days', hue='russell group filter',
@@ -256,7 +277,7 @@ def net_liquidity_days(tbl, ukprn=10007792, outdir=None):
     sb.lineplot(
         data=uni, ax=surplus_income,
         x='academic year', y='net_liquidity_days',
-        color='g', label='Exeter', zorder=2, marker='o', markersize=10
+        color='g', label=name, zorder=2, marker='o', markersize=10
     )
     surplus_income.axhline(60, label='Lower Bound', color='black', linestyle='dashed')
     surplus_income.set_ylim(-10,600)
@@ -274,6 +295,8 @@ def operating_cash_flow(tbl, ukprn=10007792, outdir=None):
 
     # Get details for single uni
     uni = tbl[tbl['ukprn']==ukprn]
+    name = uni['he provider'].unique()[0]
+
     surplus_income = sb.swarmplot(
         data=tbl,
         x='academic year', y='ops_cash_vs_income', hue='russell group filter',
@@ -282,7 +305,7 @@ def operating_cash_flow(tbl, ukprn=10007792, outdir=None):
     sb.lineplot(
         data=uni, ax=surplus_income,
         x='academic year', y='ops_cash_vs_income',
-        color='g', label='Exeter', zorder=2, marker='o', markersize=10
+        color='g', label=name, zorder=2, marker='o', markersize=10
     )
     surplus_income.set_ylim(-0.2,0.4)
     surplus_income.set(
@@ -299,6 +322,8 @@ def eoy_cash_equivalents(tbl, ukprn=10007792, outdir=None):
 
     # Get details for single uni
     uni = tbl[tbl['ukprn']==ukprn]
+    name = uni['he provider'].unique()[0]
+
     ax = sb.swarmplot(
         data=tbl,
         x='academic year', y='ops_cash_vs_income', hue='russell group filter',
@@ -307,7 +332,7 @@ def eoy_cash_equivalents(tbl, ukprn=10007792, outdir=None):
     sb.lineplot(
         data=uni, ax=ax,
         x='academic year', y='ops_cash_vs_income',
-        color='g', label='Exeter', zorder=2, marker='o', markersize=10
+        color='g', label=name, zorder=2, marker='o', markersize=10
     )
     ax.set(
         xlabel='Academic Year', 
@@ -323,6 +348,8 @@ def comparing_surplus_measures(tbl, acyear='2021/22', ukprn=10007792, outdir=Non
 
     # Get details for single uni
     uni = tbl[tbl['ukprn']==ukprn]
+    name = uni['he provider'].unique()[0]
+
     ax = sb.scatterplot(
         data=tbl[tbl['academic year']==acyear], 
         x='ops_cash_vs_income', y='surplus_vs_income', hue='russell group filter',
@@ -331,7 +358,7 @@ def comparing_surplus_measures(tbl, acyear='2021/22', ukprn=10007792, outdir=Non
     sb.scatterplot(
         data=uni[ uni['academic year']==acyear ], ax=ax,
         x='ops_cash_vs_income', y='surplus_vs_income',
-        color='g', s=200, label='Exeter', zorder=2
+        color='g', s=200, label=name, zorder=2
     )
     ax.set_ylim(-0.2,0.25)
     ax.set(
