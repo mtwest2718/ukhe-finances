@@ -116,6 +116,33 @@ def annual_surplus_income(tbl, ukprn=10007792, outdir=None):
     plt.savefig(outdir.joinpath('surplus_vs_income.png'))
     plt.clf()
 
+def unrestricted_reserves(tbl, ukprn=10007792, outdir=None):
+    print("\tUnrestricted Reserves, scaled by the total income")
+
+    # Get details for single uni
+    uni = tbl[tbl['ukprn']==ukprn]
+    name = uni['he provider'].unique()[0]
+
+    surplus_income = sb.swarmplot(
+        data=tbl,
+        x='academic year', y='unrestricted_vs_income', hue='russell group filter',
+        dodge=True, zorder=1, warn_thresh=0.2
+    )
+    sb.lineplot(
+        data=uni, ax=surplus_income,
+        x='academic year', y='unrestricted_vs_income',
+        color='g', label=name, zorder=2, marker='o', markersize=10
+    )
+    surplus_income.set_ylim(-0.2,0.25)
+    surplus_income.set(
+        xlabel='Academic Year', 
+        ylabel='Proportion of Total Income',
+        title='How big are the Unrestricted Reserves relative to total income?'
+    )
+    plt.legend(loc='lower left', title='Russell Group')
+    plt.savefig(outdir.joinpath('reserves_vs_income.png'))
+    plt.clf()
+
 def change_tuition_fees(tbl, ukprn=10007792, outdir=None):
     # Get details for single uni
     uni_name = tbl.loc[tbl['ukprn']==ukprn, 'he provider'].unique()[0]
@@ -410,6 +437,7 @@ def main():
     staffcosts_expenditure(tbl, ukprn=args.ukprn, outdir=args.figure_dir)
     average_salary(tbl, ukprn=args.ukprn, outdir=args.figure_dir)
     annual_surplus_income(tbl, ukprn=args.ukprn, outdir=args.figure_dir)
+    unrestricted_reserves(tbl, ukprn=args.ukprn, outdir=args.figure_dir)
 
     print('Scatter Plots')
     compare_staff_salary(tbl, ukprn=args.ukprn, outdir=args.figure_dir)
