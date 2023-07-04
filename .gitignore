@@ -1,7 +1,12 @@
-# ignore certain csv files
+# ignore spreadsheets
+*.xlsx
+*.ods
 kfi.csv
 # ignore figures
 *.png
 *.jpeg
 # ignore documents
 *.pdf
+*.odp
+*.odt
+*.txt
