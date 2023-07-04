@@ -8,7 +8,7 @@ import argparse
 import pathlib
 import sys
 
-def average_salary(tbl, ukprn=10007792, outdir=None):
+def average_salary(tbl, ukprn=10007792, outdir=None, group='russell group filter'):
     print("\tAnnual average salary for staff in k£")
 
     # Get details for single uni
@@ -17,7 +17,7 @@ def average_salary(tbl, ukprn=10007792, outdir=None):
 
     avg_salary = sb.swarmplot(
         data=tbl,
-        x='academic year', y='avg_salary', hue='russell group filter',
+        x='academic year', y='avg_salary', hue=group,
         dodge=True, zorder=1, warn_thresh=0.2
     )
     sb.lineplot(
@@ -31,11 +31,11 @@ def average_salary(tbl, ukprn=10007792, outdir=None):
         ylabel='Annual Salary (k£)',
         title='Average UKHE staff salary per year'
     )
-    plt.legend(loc='upper left', title='Russell Group')
+    plt.legend(loc='upper left', title=group.title())
     plt.savefig(outdir.joinpath('avg_salary.png'))
     plt.clf()
 
-def staffcosts_income(tbl, ukprn=10007792, outdir=None):
+def staffcosts_income(tbl, ukprn=10007792, outdir=None, group='russell group filter'):
     print("\tProportion of Income spent on Staff Costs")
 
     # Get details for single uni
@@ -44,7 +44,7 @@ def staffcosts_income(tbl, ukprn=10007792, outdir=None):
 
     staff_income = sb.swarmplot(
         data=tbl,
-        x='academic year', y='staff_vs_income', hue='russell group filter',
+        x='academic year', y='staff_vs_income', hue=group,
         dodge=True, zorder=1, warn_thresh=0.2
     )
     sb.lineplot(
@@ -58,11 +58,11 @@ def staffcosts_income(tbl, ukprn=10007792, outdir=None):
         ylabel='Proportion of Total Income',
         title='What proportion of income is spent on staff costs'
     )
-    plt.legend(loc='lower left', title='Russell Group')
+    plt.legend(loc='lower left', title=group.title())
     plt.savefig(outdir.joinpath('staff_vs_income.png'))
     plt.clf()
 
-def staffcosts_expenditure(tbl, ukprn=10007792, outdir=None):
+def staffcosts_expenditure(tbl, ukprn=10007792, outdir=None, group='russell group filter'):
     print("\tWhat proportion of Total Expenditure is Staff Costs")
 
     # Get details for single uni
@@ -71,7 +71,7 @@ def staffcosts_expenditure(tbl, ukprn=10007792, outdir=None):
 
     staff_expend = sb.swarmplot(
         data=tbl,
-        x='academic year', y='staff_vs_expend', hue='russell group filter',
+        x='academic year', y='staff_vs_expend', hue=group,
         dodge=True, zorder=1, warn_thresh=0.2
     )
     sb.lineplot(
@@ -85,11 +85,11 @@ def staffcosts_expenditure(tbl, ukprn=10007792, outdir=None):
         ylabel='Proportion of Total Expenditure',
         title='What proportion of annual expenditure is staff costs'
     )
-    plt.legend(loc='lower left', title='Russell Group')
+    plt.legend(loc='lower left', title=group.title())
     plt.savefig(outdir.joinpath('staff_vs_expend.png'))
     plt.clf()
 
-def annual_surplus_income(tbl, ukprn=10007792, outdir=None):
+def annual_surplus_income(tbl, ukprn=10007792, outdir=None, group='russell group filter'):
     print("\tHow big is the annual surplus, scaled by the total income")
 
     # Get details for single uni
@@ -98,7 +98,7 @@ def annual_surplus_income(tbl, ukprn=10007792, outdir=None):
 
     surplus_income = sb.swarmplot(
         data=tbl,
-        x='academic year', y='surplus_vs_income', hue='russell group filter',
+        x='academic year', y='surplus_vs_income', hue=group,
         dodge=True, zorder=1, warn_thresh=0.2
     )
     sb.lineplot(
@@ -112,11 +112,11 @@ def annual_surplus_income(tbl, ukprn=10007792, outdir=None):
         ylabel='Proportion of Total Income',
         title='How big is the annual surplus relative to total income?'
     )
-    plt.legend(loc='lower left', title='Russell Group')
+    plt.legend(loc='lower left', title=group.title())
     plt.savefig(outdir.joinpath('surplus_vs_income.png'))
     plt.clf()
 
-def unrestricted_reserves(tbl, ukprn=10007792, outdir=None):
+def unrestricted_reserves(tbl, ukprn=10007792, outdir=None, group='russell group filter'):
     print("\tUnrestricted Reserves, scaled by the total income")
 
     # Get details for single uni
@@ -125,7 +125,7 @@ def unrestricted_reserves(tbl, ukprn=10007792, outdir=None):
 
     ax = sb.swarmplot(
         data=tbl,
-        x='academic year', y='unrestricted_vs_income', hue='russell group filter',
+        x='academic year', y='unrestricted_vs_income', hue=group,
         dodge=True, zorder=2, warn_thresh=0.2
     )
     sb.lineplot(
@@ -140,11 +140,11 @@ def unrestricted_reserves(tbl, ukprn=10007792, outdir=None):
         ylabel='Proportion of Total Income',
         title='How big are the Unrestricted Reserves relative to total income?'
     )
-    plt.legend(loc='upper left', title='Russell Group')
+    plt.legend(loc='upper left', title=group.title())
     plt.savefig(outdir.joinpath('reserves_vs_income.png'))
     plt.clf()
 
-def external_borrowing(tbl, ukprn=10007792, outdir=None):
+def external_borrowing(tbl, ukprn=10007792, outdir=None, group='russell group filter'):
     print("\tThe scale of external borrowing by year")
 
     # Get details for single uni
@@ -153,7 +153,7 @@ def external_borrowing(tbl, ukprn=10007792, outdir=None):
 
     ax = sb.swarmplot(
         data=tbl,
-        x='academic year', y='ext_borrow_vs_income', hue='russell group filter',
+        x='academic year', y='ext_borrow_vs_income', hue=group,
         dodge=True, zorder=2, warn_thresh=0.2
     )
     sb.lineplot(
@@ -168,11 +168,11 @@ def external_borrowing(tbl, ukprn=10007792, outdir=None):
         ylabel='Proportion of Total Income',
         title='How much external borrowing does each institution do?'
     )
-    plt.legend(loc='upper left', title='Russell Group')
+    plt.legend(loc='upper left', title=group.title())
     plt.savefig(outdir.joinpath('extborrow_vs_income.png'))
     plt.clf()
 
-def asset_liability_ratio(tbl, ukprn=10007792, outdir=None):
+def asset_liability_ratio(tbl, ukprn=10007792, outdir=None, group='russell group filter'):
     print("\tThe ratio of currenet assets to liabilities")
 
     # Get details for single uni
@@ -181,7 +181,7 @@ def asset_liability_ratio(tbl, ukprn=10007792, outdir=None):
 
     ax = sb.swarmplot(
         data=tbl,
-        x='academic year', y='current_assets_vs_liability', hue='russell group filter',
+        x='academic year', y='current_assets_vs_liability', hue=group,
         dodge=True, zorder=2, warn_thresh=0.2
     )
     sb.lineplot(
@@ -196,11 +196,11 @@ def asset_liability_ratio(tbl, ukprn=10007792, outdir=None):
         ylabel='Ratio of assets to liabilities',
         title='Measure of ability to pay near future debts from "liquid" assets.'
     )
-    plt.legend(loc='upper left', title='Russell Group')
+    plt.legend(loc='upper left', title=group.title())
     plt.savefig(outdir.joinpath('asset_vs_liabilities.png'))
     plt.clf()
 
-def change_tuition_fees(tbl, ukprn=10007792, outdir=None):
+def change_tuition_fees(tbl, ukprn=10007792, outdir=None, group='russell group filter'):
     # Get details for single uni
     uni_name = tbl.loc[tbl['ukprn']==ukprn, 'he provider'].unique()[0]
 
@@ -215,7 +215,7 @@ def change_tuition_fees(tbl, ukprn=10007792, outdir=None):
     print("\tGauging how tuition fees changes over time for each institution")
     tuition_fees = sb.lineplot(
         data=pct,
-        x='academic year', y='tuition_fees', hue='russell group filter',
+        x='academic year', y='tuition_fees', hue=group,
         alpha=0.6, estimator=None, units='ukprn', lw=3, zorder=1
     )
     sb.scatterplot(
@@ -229,11 +229,11 @@ def change_tuition_fees(tbl, ukprn=10007792, outdir=None):
         ylabel='Percent change in tuition fee income',
         title='How has UKHE income from tuition fees changed over time?'
     )
-    plt.legend(loc='upper left', title='Russell Group')
+    plt.legend(loc='upper left', title=group.title())
     plt.savefig(outdir.joinpath('total_tuition_fees.png'))
     plt.clf()
 
-def tuition_fee_proportion(tbl, ukprn=10007792, outdir=None):
+def tuition_fee_proportion(tbl, ukprn=10007792, outdir=None, group='russell group filter'):
     print("\tUnderstand what portion of income comes from Student Fees")
 
     # Get details for single uni
@@ -242,7 +242,7 @@ def tuition_fee_proportion(tbl, ukprn=10007792, outdir=None):
 
     fee_income = sb.scatterplot(
         data=tbl[ tbl['academic year']=='2021/22' ], 
-        x='total_fees_vs_income', y='uk_vs_total_fees', hue='russell group filter',
+        x='total_fees_vs_income', y='uk_vs_total_fees', hue=group,
         zorder=1, legend=True
     )
     sb.scatterplot(
@@ -257,11 +257,11 @@ def tuition_fee_proportion(tbl, ukprn=10007792, outdir=None):
         ylabel='Proportion of fee income from UK students',
         title='Contribution of student fees to UKHE income in 2021/22'
     )
-    plt.legend(loc='lower right', title='Russell Group')
+    plt.legend(loc='lower right', title=group.title())
     plt.savefig(outdir.joinpath('fees_vs_income.png'))
     plt.clf()
 
-def capital_projects(tbl, ukprn=10007792, outdir=None):
+def capital_projects(tbl, ukprn=10007792, outdir=None, group='russell group filter'):
     print("\tHow of total expenditures is spent on capital projects")
 
     # Get details for single uni
@@ -270,7 +270,7 @@ def capital_projects(tbl, ukprn=10007792, outdir=None):
 
     capital_expend = sb.swarmplot(
         data=tbl,
-        x='academic year', y='capital_vs_expend', hue='russell group filter',
+        x='academic year', y='capital_vs_expend', hue=group,
         dodge=True, zorder=1, warn_thresh=0.2
     )
     sb.lineplot(
@@ -284,11 +284,11 @@ def capital_projects(tbl, ukprn=10007792, outdir=None):
         ylabel='Proportion of annual Total Expenditure',
         title='What proportion of annual expenditure is on Capital Costs?'
     )
-    plt.legend(loc='upper center', title='Russell Group')
+    plt.legend(loc='upper center', title=group.title())
     plt.savefig(outdir.joinpath('capital_expenditure.png'))
     plt.clf()
 
-def galt_index(tbl, ukprn=10007792, outdir=None):
+def galt_index(tbl, ukprn=10007792, outdir=None, group='russell group filter'):
     print("\tRatio of VC remuneration to that average remuneration of staff.")
 
     # Get details for single uni
@@ -297,7 +297,7 @@ def galt_index(tbl, ukprn=10007792, outdir=None):
 
     vc = sb.swarmplot(
         data=tbl,
-        x='academic year', y='vc_avg_remunerate', hue='russell group filter',
+        x='academic year', y='vc_avg_remunerate', hue=group,
         dodge=True, zorder=1, warn_thresh=0.2
     )
     sb.lineplot(
@@ -311,12 +311,12 @@ def galt_index(tbl, ukprn=10007792, outdir=None):
         ylabel='Ratio of VC to staff average',
         title="How does the VC's remuneration compare to the rest of staff?"
     )
-    plt.legend(loc='lower left', title='Russell Group')
+    plt.legend(loc='lower left', title=group.title())
     plt.savefig(outdir.joinpath('vc_compensation.png'))
     plt.clf()
 
 
-def compare_staff_salary(tbl, acyear='2021/22', ukprn=10007792, outdir=None):
+def compare_staff_salary(tbl, acyear='2021/22', ukprn=10007792, outdir=None, group='russell group filter'):
     print("\tComparing average salaries for academics and ps-staff")
 
     # Get details for single uni
@@ -325,7 +325,7 @@ def compare_staff_salary(tbl, acyear='2021/22', ukprn=10007792, outdir=None):
 
     ax = sb.scatterplot(
         data=tbl[tbl['academic year']==acyear], 
-        x='academic_salary', y='ps_staff_salary', hue='russell group filter',
+        x='academic_salary', y='ps_staff_salary', hue=group,
         zorder=2, legend=True
     )
     sb.scatterplot(
@@ -344,11 +344,11 @@ def compare_staff_salary(tbl, acyear='2021/22', ukprn=10007792, outdir=None):
         [20, 80], [20, 80], zorder=1,
         color='black', linestyle='dashed', linewidth=2, label='Equality'
     )
-    plt.legend(loc='upper right', title='Russell Group')
+    plt.legend(loc='upper right', title=group.title())
     plt.savefig(outdir.joinpath('compare_salaries.png'))
     plt.clf()
 
-def net_liquidity_days(tbl, ukprn=10007792, outdir=None):
+def net_liquidity_days(tbl, ukprn=10007792, outdir=None, group='russell group filter'):
     print("\tNet Liquidity Days")
 
     # Get details for single uni
@@ -357,7 +357,7 @@ def net_liquidity_days(tbl, ukprn=10007792, outdir=None):
 
     surplus_income = sb.swarmplot(
         data=tbl,
-        x='academic year', y='net_liquidity_days', hue='russell group filter',
+        x='academic year', y='net_liquidity_days', hue=group,
         dodge=True, zorder=1, warn_thresh=0.2
     )
     sb.lineplot(
@@ -372,11 +372,11 @@ def net_liquidity_days(tbl, ukprn=10007792, outdir=None):
         ylabel='Days of Operating Cost Coverage',
         title='A measure of institutions abilitity to costs from liquid assets'
     )
-    plt.legend(loc='upper left', title='Russell Group')
+    plt.legend(loc='upper left', title=group.title())
     plt.savefig(outdir.joinpath('net_liquidity_days.png'))
     plt.clf()
 
-def operating_cash_flow(tbl, ukprn=10007792, outdir=None):
+def operating_cash_flow(tbl, ukprn=10007792, outdir=None, group='russell group filter'):
     print("\tNet cash flow")
 
     # Get details for single uni
@@ -385,7 +385,7 @@ def operating_cash_flow(tbl, ukprn=10007792, outdir=None):
 
     ax = sb.swarmplot(
         data=tbl,
-        x='academic year', y='ops_cash_vs_income', hue='russell group filter',
+        x='academic year', y='ops_cash_vs_income', hue=group,
         dodge=True, zorder=1, warn_thresh=0.2
     )
     sb.lineplot(
@@ -400,11 +400,11 @@ def operating_cash_flow(tbl, ukprn=10007792, outdir=None):
         ylabel='Proportion of Total Income',
         title='What is the net cash flow from Operating Actives relative to income?'
     )
-    plt.legend(loc='upper left', title='Russell Group')
+    plt.legend(loc='upper left', title=group.title())
     plt.savefig(outdir.joinpath('opscash_vs_income.png'))
     plt.clf()
 
-def comparing_surplus_measures(tbl, acyear='2021/22', ukprn=10007792, outdir=None):
+def comparing_surplus_measures(tbl, acyear='2021/22', ukprn=10007792, outdir=None, group='russell group filter'):
     print("\tAnnual surplus measures for "+acyear)
 
     # Get details for single uni
@@ -413,7 +413,7 @@ def comparing_surplus_measures(tbl, acyear='2021/22', ukprn=10007792, outdir=Non
 
     ax = sb.scatterplot(
         data=tbl[tbl['academic year']==acyear], 
-        x='ops_cash_vs_income', y='surplus_vs_income', hue='russell group filter',
+        x='ops_cash_vs_income', y='surplus_vs_income', hue=group,
         zorder=3, legend=True
     )
     sb.scatterplot(
@@ -430,7 +430,7 @@ def comparing_surplus_measures(tbl, acyear='2021/22', ukprn=10007792, outdir=Non
         ylabel='Total annual surplus',
         title='Financial surplus measures relative to total income in '+acyear,
     )
-    plt.legend(loc='lower right', title='Russell Group')
+    plt.legend(loc='lower right', title=group.title())
     plt.savefig(outdir.joinpath('compare_surplus.png'))
     plt.clf()
 
