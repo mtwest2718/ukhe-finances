@@ -1,7 +1,6 @@
 # ignore spreadsheets
 *.xlsx
 *.ods
-kfi.csv
 # ignore figures
 *.png
 *.jpeg
