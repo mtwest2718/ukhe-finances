@@ -233,6 +233,34 @@ def change_tuition_fees(tbl, ukprn=10007792, outdir=None, group='russell group f
     plt.savefig(outdir.joinpath('total_tuition_fees.png'))
     plt.clf()
 
+def tuition_vs_surplus(tbl, ukprn=10007792, outdir=None, group='russell group filter', year='2020/21'):
+    print("\tThe relationship between tuition fee income and annual surplus")
+
+    # Get details for single uni
+    uni = tbl[tbl['ukprn']==ukprn]
+    name = uni['he provider'].unique()[0]
+
+    fee_income = sb.scatterplot(
+        data=tbl[ tbl['academic year']==year ], 
+        x='surplus_vs_income', y='total_fees_vs_income', hue=group,
+        zorder=1, legend=True
+    )
+    sb.scatterplot(
+        data=uni[ uni['academic year']==year ], ax=fee_income,
+        x='surplus_vs_income', y='total_fees_vs_income',
+        color='g', s=200, label=name, zorder=2
+    )
+    fee_income.set_xlim(-0.2,0.25)
+    fee_income.set_ylim(0,1)
+    fee_income.set(
+        xlabel='Total annual surplus relative to Total income', 
+        ylabel='Proportion of income from student fees', 
+        title=f'Relationship beween fee income and annual surplus in {year}'
+    )
+    plt.legend(loc='lower left', title=group.title())
+    plt.savefig(outdir.joinpath('fees_vs_surplus.png'))
+    plt.clf()
+
 def tuition_fee_proportion(tbl, ukprn=10007792, outdir=None, group='russell group filter'):
     print("\tUnderstand what portion of income comes from Student Fees")
 
@@ -481,6 +509,7 @@ def main():
     compare_staff_salary(tbl, ukprn=args.ukprn, outdir=args.figure_dir)
     comparing_surplus_measures(tbl, ukprn=args.ukprn, outdir=args.figure_dir)
     tuition_fee_proportion(tbl, ukprn=args.ukprn, outdir=args.figure_dir)
+    tuition_vs_surplus(tbl, ukprn=args.ukprn, outdir=args.figure_dir)
 
     print('Line Plots') 
     change_tuition_fees(tbl, ukprn=args.ukprn, outdir=args.figure_dir)
